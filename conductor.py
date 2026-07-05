@@ -15,6 +15,7 @@ class Conductor:
         self.proton_radius = 2
         self.q_electron = -1
         self.K = 1 # Couloumb's constant 
+        self.eta = 10
 
         self.softening = 0.1 # prevents division by zero in Couloumb's law
 
@@ -57,7 +58,10 @@ class Conductor:
     
     def update_positions(self): 
         force = self.calculate_total_force()
-        print(force)
+        new_positions = self.electrons + force * self.eta
+        new_positions[:, 0] = np.clip(new_positions[:, 0], self.pos[0], self.pos[0] + self.size)
+        new_positions[:, 1] = np.clip(new_positions[:, 1], self.pos[1], self.pos[1] + self.size)
+        self.electrons = new_positions
         
 
 
