@@ -3,6 +3,5 @@
 Overdamped massless relaxation (gradient descent)
 
 $$
-
-r^(t+1) = r^(t) + eta *F^(t)
+r^t = r^t + eta *F^t
 $$
