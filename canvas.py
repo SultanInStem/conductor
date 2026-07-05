@@ -1,6 +1,4 @@
 import pygame 
-import random
-import math
 from conductor import Conductor
 
 
@@ -8,7 +6,6 @@ CANVAS_WIDTH = 1200
 CANVAS_HEIGHT = 800
 FPS = 60
 
-random.seed(42)
 
 
 
@@ -28,9 +25,12 @@ class Canvas:
                 pygame.quit()
                 exit()
 
+
+
+
     def render(self):
         self.screen.fill((0, 0, 0))  # Fill the screen with white
-
+        self.conductor.update_positions()
         self.conductor.show(self.screen)
         pygame.display.flip()
         self.clock.tick(FPS)
