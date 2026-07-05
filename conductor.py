@@ -15,7 +15,7 @@ class Conductor:
         self.proton_radius = 2
         self.q_electron = -1
         self.K = 1 # Couloumb's constant 
-        self.eta = 10
+        self.eta = 10 # convergence rate in the gradient descent (to be tuned by trial and error)
 
         self.softening = 0.1 # prevents division by zero in Couloumb's law
 
@@ -55,7 +55,7 @@ class Conductor:
 
         return force_from_protons + force_from_electrons
 
-    
+
     def update_positions(self): 
         force = self.calculate_total_force()
         new_positions = self.electrons + force * self.eta
@@ -64,5 +64,18 @@ class Conductor:
         self.electrons = new_positions
         
 
+    def measure_electric_field(self): 
+        E = 0 
+        n = 30 # number of test points inside and outside 
 
+
+        ### computing mean electric field inside
+        
+
+
+
+
+
+
+        return E
     
