@@ -14,7 +14,7 @@ class Conductor:
         self.q_proton = +1
         self.proton_radius = 2
         self.q_electron = -1
-        self.k = 1 # Couloumb's constant 
+        self.K = 1 # Couloumb's constant 
 
         self.softening = 0.1 # prevents division by zero in Couloumb's law
 
@@ -33,31 +33,32 @@ class Conductor:
         pygame.draw.rect(screen, self.color, (self.pos[0], self.pos[1], self.size, self.size), 1)
 
 
-
     def calculate_total_force(self):
+        # Force from protons on each electron
+        diff_ep = self.electrons[:, None, :] - self.protons[None, :, :]      # (N_e, N_p, 2)
+        dist2_ep = (diff_ep ** 2).sum(axis=-1) + self.softening ** 2
+        dist_cubed_ep = dist2_ep ** 1.5
+        force_ep = self.K * self.q_proton * self.q_electron * diff_ep / dist_cubed_ep[..., None]
+        force_from_protons = force_ep.sum(axis=1)                            # (N_e, 2)
 
-        net_force = []
-        for i in range(0, len(self.electrons)): 
-            target_pos = self.electrons[i]
-            force_x = 0 
-            force_y = 0 
-            ## force due to other electrons 
-            for j in range(0, len(self.electrons)): 
-                if i == j: continue
-                source_pos = self.electrons[j]
-                dist_squared = (target_pos[0] - source_pos[0])**2 + (target_pos[1] - source_pos[1])**2 + self.softening ** 2
-                
+        # Force from other electrons on each electron
+        diff_ee = self.electrons[:, None, :] - self.electrons[None, :, :]     # (N_e, N_e, 2)
+        dist2_ee = (diff_ee ** 2).sum(axis=-1) + self.softening ** 2
+        dist_cubed_ee = dist2_ee ** 1.5
+        force_ee = self.K * self.q_electron ** 2 * diff_ee / dist_cubed_ee[..., None]
 
+        N_e = self.electrons.shape[0]
+        force_ee[np.arange(N_e), np.arange(N_e), :] = 0.0                    # zero self-interaction
 
-            ## force due to protons
-            
-            net_force.append([force_x, force_y])
+        force_from_electrons = force_ee.sum(axis=1)
 
+        return force_from_protons + force_from_electrons
 
-        return net_force
     
     def update_positions(self): 
-        pass
+        force = self.calculate_total_force()
+        print(force)
+        
 
 
     
