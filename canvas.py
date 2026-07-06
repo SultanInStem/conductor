@@ -31,6 +31,7 @@ class Canvas:
     def render(self):
         self.screen.fill((0, 0, 0))  # Fill the screen with white
         self.conductor.update_positions()
+        self.conductor.measure_electric_field()
         self.conductor.show(self.screen)
         pygame.display.flip()
         self.clock.tick(FPS)

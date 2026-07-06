@@ -1,6 +1,7 @@
 import pygame
 import numpy as np 
 import math
+import random
 
 class Conductor: 
     def __init__(self, size, color, pos, lattice_spacing = 10):
@@ -65,17 +66,43 @@ class Conductor:
         
 
     def measure_electric_field(self): 
-        E = 0 
         n = 30 # number of test points inside and outside 
 
 
         ### computing mean electric field inside
+        grid_size = 0.5 * self.size # 70 percent of the conductor size 
+        low = self.pos[0] + (self.size - grid_size) // 2
+        high = low + grid_size
+
+        points_inside = -low + (high - (-low)) * np.random.rand(n, 2)
+        E_x = 0 
+        E_y = 0
+
+        charge_pos = np.vstack([self.electrons, self.protons])
+        charge_q   = np.concatenate([
+            np.full(len(self.electrons), self.q_electron),
+            np.full(len(self.protons), self.q_proton)
+        ])  
+        points = np.array(points_inside)
+        dx = points[:, 0:1] - charge_pos[:, 0][None, :]    # points_x - charge_x
+        dy = points[:, 1:2] - charge_pos[:, 1][None, :]
+        dist_cubed = (dx**2 + dy**2 + self.softening**2) ** 1.5
+
+        Ex_matrix = self.K * charge_q[None, :] * (dx) / dist_cubed   # shape (P, N)
+        Ey_matrix = self.K * charge_q[None, :] * (dy) / dist_cubed
+
+        E_x = Ex_matrix.sum()   # sum over all points AND all charges
+        E_y = Ey_matrix.sum()
+        avg_E_inside = np.sqrt(E_x**2 + E_y**2) / n
+        print(avg_E_inside)
+
+
+        ### computing electric field just outside the conductor 
+
+        padding = 10 # perpendicular distance from the boundary 
+        points_outside = []
+        i = 0
         
-
-
-
-
-
-
-        return E
+               
+        return 1
     
