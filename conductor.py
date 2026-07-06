@@ -66,7 +66,7 @@ class Conductor:
         
 
     def measure_electric_field(self): 
-        n = 30 # number of test points inside and outside 
+        n = 50 # number of test points inside and outside 
 
 
         ### computing mean electric field inside
@@ -94,15 +94,43 @@ class Conductor:
         E_x = Ex_matrix.sum()   # sum over all points AND all charges
         E_y = Ey_matrix.sum()
         avg_E_inside = np.sqrt(E_x**2 + E_y**2) / n
-        print(avg_E_inside)
 
 
         ### computing electric field just outside the conductor 
 
         padding = 10 # perpendicular distance from the boundary 
-        points_outside = []
-        i = 0
-        
+        regions = np.array([
+            [self.pos[0] - padding, self.pos[1] - padding, self.pos[0], self.pos[1] + padding], 
+            [self.pos[0] + self.size, self.pos[1] - padding, self.pos[0] + self.size + padding, self.pos[1] + padding], 
+            [self.pos[0] - padding, self.pos[1] - padding, self.pos[0] + grid_size + padding, self.pos[1]], 
+            [self.pos[0] - padding, self.pos[1], self.pos[0] + grid_size + padding, self.pos[1] + padding],   
+        ])
+
+        points_outside = np.empty((n, 2))
+        for i in range(0, len(points_outside)): 
+            random_region = regions[random.randint(0,3)]
+            x = random.uniform(random_region[0], random_region[2]) 
+            y = random.uniform(random_region[1], random_region[3])
+            points_outside[i] = [x, y]
+
+        E_x = 0
+        E_y = 0
+
+        dx = points_outside[:, 0:1] - charge_pos[:, 0][None, :]    # points_x - charge_x
+        dy = points_outside[:, 1:2] - charge_pos[:, 1][None, :]
+        dist_cubed = (dx**2 + dy**2 + self.softening**2) ** 1.5
+
+        Ex_matrix = self.K * charge_q[None, :] * (dx) / dist_cubed   # shape (P, N)
+        Ey_matrix = self.K * charge_q[None, :] * (dy) / dist_cubed
+
+        E_x = Ex_matrix.sum()   # sum over all points AND all charges
+        E_y = Ey_matrix.sum()
+
+        avg_E_outside = np.sqrt(E_x**2 + E_y**2) / n
+
+
+        print("Electric field ratio: ",  avg_E_inside / avg_E_outside)
+
                
         return 1
     
