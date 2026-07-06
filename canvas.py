@@ -1,6 +1,6 @@
 import pygame 
 from conductor import Conductor
-
+import sys
 
 CANVAS_WIDTH = 1200
 CANVAS_HEIGHT = 800
@@ -15,6 +15,8 @@ class Canvas:
         self.running = True
         self.screen = pygame.display.set_mode((CANVAS_WIDTH, CANVAS_HEIGHT))
         pygame.display.set_caption("conductor")
+        self.my_font = pygame.font.SysFont(None, 50)
+        self.text_surface = self.my_font.render("Hello, Pygame!", True, (255, 255, 255))
         self.conductor = Conductor(400, (255,255,255), (CANVAS_WIDTH // 2 - 200, CANVAS_HEIGHT // 2 - 200))
         self.clock = pygame.time.Clock()
 
@@ -31,7 +33,9 @@ class Canvas:
     def render(self):
         self.screen.fill((0, 0, 0))  # Fill the screen with white
         self.conductor.update_positions()
-        self.conductor.measure_electric_field()
+        electric_field = self.conductor.measure_electric_field()
+        self.text_surface = self.my_font.render(f"Ratio of E-field inside to outside: {electric_field}", True, (255, 255, 255))
+        self.screen.blit(self.text_surface, (100, 100))
         self.conductor.show(self.screen)
         pygame.display.flip()
         self.clock.tick(FPS)

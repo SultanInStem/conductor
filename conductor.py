@@ -98,7 +98,7 @@ class Conductor:
 
         ### computing electric field just outside the conductor 
 
-        padding = 10 # perpendicular distance from the boundary 
+        padding = 20 # perpendicular distance from the boundary 
         regions = np.array([
             [self.pos[0] - padding, self.pos[1] - padding, self.pos[0], self.pos[1] + padding], 
             [self.pos[0] + self.size, self.pos[1] - padding, self.pos[0] + self.size + padding, self.pos[1] + padding], 
@@ -128,9 +128,7 @@ class Conductor:
 
         avg_E_outside = np.sqrt(E_x**2 + E_y**2) / n
 
-
-        print("Electric field ratio: ",  avg_E_inside / avg_E_outside)
-
-               
-        return 1
+        field_ratio = avg_E_inside / avg_E_outside 
+        
+        return round(field_ratio, 4)
     
